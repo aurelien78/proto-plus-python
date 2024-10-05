@@ -33,7 +33,12 @@ def compile(name, attrs):
     # Pull a reference to the module where this class is being
     # declared.
     module = sys.modules.get(attrs.get("__module__"))
-    module_name = module.__name__ if hasattr(module, __name__) else ""
+    module_name = module.__name__ if hasattr(module, "__name__") else ""
+    if '.' in module_name:
+        parts = module_name.split('.')
+        package_name =  '.'.join(parts[:-1])
+    else:
+        package_name = module_name
     proto_module = getattr(module, "__protobuf__", object())
 
     # A package should be present; get the marshal from there.
@@ -42,7 +47,7 @@ def compile(name, attrs):
     # "TypeError: Couldn't build proto file into descriptor pool: invalid name: empty part ()' means"
     # during an attempt to add to descriptor pool.
     package = getattr(
-        proto_module, "package", module_name if module_name else "_default_package"
+        proto_module, "package", package_name if package_name else "_default_package"
     )
     marshal = Marshal(name=getattr(proto_module, "marshal", package))
 
