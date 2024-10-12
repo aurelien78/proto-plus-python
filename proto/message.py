@@ -15,6 +15,7 @@
 import collections
 import collections.abc
 import copy
+import json
 import re
 from typing import List, Optional, Type
 import warnings
@@ -548,7 +549,30 @@ class MessageMeta(type):
         instance = cls()
         Parse(payload, instance._pb, ignore_unknown_fields=ignore_unknown_fields)
         return instance
-
+    
+    def to_dictWithJsonName(
+        cls,
+        instance,
+        *,
+        use_integers_for_enums=True,
+        preserving_proto_field_name=True,
+        including_default_value_fields=None,
+        float_precision=None,
+        always_print_fields_with_no_presence=None,
+    ) -> "Message":
+        l_Json = cls.to_json(
+            instance = instance,
+            use_integers_for_enums = use_integers_for_enums,
+            including_default_value_fields = including_default_value_fields,
+            preserving_proto_field_name = preserving_proto_field_name,
+            sort_keys = False,
+            indent = 2,
+            float_precision = float_precision,
+            always_print_fields_with_no_presence = always_print_fields_with_no_presence
+        )
+        l_Dict = json.loads(l_Json)
+        return l_Dict
+    
     def to_dict(
         cls,
         instance,
